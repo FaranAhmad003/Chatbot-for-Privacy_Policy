@@ -3,10 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Page</title>
+    <link rel="stylesheet" href="style.css">
+    <title>PDF Parser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <h1>Welcome, Admin!</h1>
-    <!-- Your admin-specific content goes here -->
+    <div class="container">
+        <h1 class="text-4xl py-6 px-4">PDF Parser</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data" class="px-4">
+            <input type="file" name="pdfFile" accept=".pdf" required>
+            <button type="submit" class="bg-blue-300 border-2 border-blue-300 shadow-lg px-4 py-2 rounded-lg">Parse PDF</button>
+        </form>
+        <div id="result-container" class="mt-6">
+            <h2 class="px-3 py-2 text-2xl font-semibold">Extracted Text:</h2>
+            <pre class="text-center w-full overflow-x-auto bg-gray-200 p-4 rounded-md" id="extracted-text"></pre>
+            <!-- Add a new div for ChatGPT response -->
+            <h2 class="px-3 py-2 text-2xl font-semibold mt-6">ChatGPT Response:</h2>
+            <pre class="text-center w-full overflow-x-auto bg-gray-200 p-4 rounded-md" id="chatgpt-response"></pre>
+        </div>
+    </div>
+<script>
+    document.querySelector('form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const data = await response.text();
+                document.getElementById('extracted-text').textContent = `Extracted Text:\n${data}`;
+
+                // Fetch ChatGPT response
+                const chatGptResponse = await fetch('/chatgpt', {
+                    method: 'POST',
+                    body: JSON.stringify({ prompt: data }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (chatGptResponse.ok) {
+                    const chatGptData = await chatGptResponse.text();
+                    document.getElementById('chatgpt-response').textContent = `ChatGPT Response:\n${chatGptData}`;
+                } else {
+                    console.error('Failed to get ChatGPT response.');
+                }
+            } else {
+                console.error('Failed to parse PDF.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+</script>
+
 </body>
 </html>

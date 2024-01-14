@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const speakeasy = require('speakeasy');
 const session = require('express-session');
-const { exec } = require('child_process');
+
 const app = express();
 const port = 3000;
 
@@ -234,17 +234,6 @@ app.post('/login', (req, res) => {
             console.log('Invalid user_type');
             res.status(401).json({ error: 'Invalid user_type' });
           }
-
-
-          // Move the exec code inside this block
-          exec(`open "${htmlFilePath}"`, (error) => {
-            if (error) {
-              console.error(`Error opening "${htmlFilePath}" in the browser: ${error.message}`);
-              process.exit(1);
-            } else {
-              console.log(`Redirected to ${htmlFilePath}`);
-            }
-          });
 
         } else {
           // Login failed
