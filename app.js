@@ -37,7 +37,7 @@ connection.connect((err) => {
 
 // Serve the HTML page
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/signup.html');
+  res.sendFile(__dirname + '/login.html');
 });
 app.get('/signup', (req, res) => {
   res.sendFile(__dirname + '/signup.html');
