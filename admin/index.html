@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatGPT-like App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #chat-container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    #messages {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .message {
+      background-color: #f0f0f0;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    #message-input {
+      width: calc(100% - 20px);
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <ul id="messages"></ul>
+    <input type="text" id="message-input" placeholder="Ask a question...">
+  </div>
+
+  <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+  <script>
+    const socket = io();
+
+    const messagesList = document.getElementById('messages');
+    const messageInput = document.getElementById('message-input');
+
+    messageInput.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        const message = messageInput.value;
+        if (message.trim() !== '') {
+          socket.emit('message', { text: message });
+          messageInput.value = '';
+        }
+      }
+    });
+
+    socket.on('messages', (messages) => {
+      messages.forEach((message) => {
+        displayMessage(message);
+      });
+    });
+
+    socket.on('message', (message) => {
+      displayMessage(message);
+    });
+
+    function displayMessage(message) {
+      const listItem = document.createElement('li');
+      listItem.classList.add('message');
+      listItem.textContent = message.text;
+      messagesList.appendChild(listItem);
+    }
+  </script>
+</body>
+</html>
