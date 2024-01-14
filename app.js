@@ -172,6 +172,12 @@ app.post('/verifyOTP', (req, res) => {
 app.get('/setNewPassword', (req, res) => {
   res.sendFile(__dirname + '/setNewPassword.html');
 });
+app.get('/client', (req, res) => {
+  res.sendFile(__dirname + '/client/client.html');
+});
+app.get('/admin', (req, res) => {
+  res.sendFile(__dirname + '/admin/admin.html');
+});
 app.post('/setNewPassword', (req, res) => {
   const newPassword = req.body.newPassword;
 
@@ -204,9 +210,7 @@ app.post('/setNewPassword', (req, res) => {
 });
 app.post('/login', (req, res) => {
   const formData = req.body;
-  let htmlFilePath; // Define htmlFilePath here
-
-  // Query the 'user' table to check login credentials and get user_type
+  
   connection.query(
     'SELECT * FROM user WHERE username = ? AND password = ?',
     [formData.username, formData.password],
@@ -220,11 +224,9 @@ app.post('/login', (req, res) => {
 
           // Check the user_type
           if (user.user_type === 'admin') {
-            htmlFilePath = __dirname + "/admin/admin.html";
             console.log('Admin logged in successfully');
             res.json({ success: true, userType: 'admin' });
           } else if (user.user_type === 'client') {
-            htmlFilePath = __dirname + "/client/client.html";
             console.log('Client logged in successfully');
             res.json({ success: true, userType: 'client' });
           } else {

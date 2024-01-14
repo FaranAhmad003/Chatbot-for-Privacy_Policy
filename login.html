@@ -82,8 +82,7 @@
         password: document.getElementById('password').value
       };
 
-      // Send data to Node.js route (replace 'your-node-route' with the actual route)
-      fetch('/login', {
+        fetch('/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,9 +93,14 @@
       .then(data => {
         // Handle response from the server
         console.log(data);
-        if (data.success) {
-          // Redirect the user to the OTP verification page
-          window.location.href = '/loginConfirmation';
+        if (data.success) 
+        {
+          if (data.userType === 'admin')
+          {
+            window.location.href = '/admin';
+          }
+          else
+          window.location.href = '/client';
         } else {
           // Handle other cases or show error messages
           document.getElementById('errorMessage').textContent = 'Invalid username or password';
