@@ -4,7 +4,7 @@ async function handleConnection(socket, io, genAI) {
   socket.on('question', async (question) => {
     // Process the user's question using the Google Generative AI
     const response = await generateResponse(question, genAI);
-
+    console.log("Handle connection called");
     // Broadcast the response back to the client
     io.emit('response', response);
   });

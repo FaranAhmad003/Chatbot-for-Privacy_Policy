@@ -3,9 +3,23 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql2');
 const speakeasy = require('speakeasy');
 const session = require('express-session');
+const http = require('http');
+const socketIO = require('socket.io');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { setUsername, getUsername } = require('./userdata');
 
-const app = express();
+require('dotenv').config(); // Load environment variables
 const port = 3000;
+const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
+const apiKey = process.env.API_KEY;
+if (!apiKey) {
+  console.error('API_KEY is missing in the environment variables.');
+  process.exit(1); // Exit the application if the API key is missing
+}
+
+const genAI = new GoogleGenerativeAI(apiKey);
 
 // Middleware to parse JSON in the request body
 app.use(bodyParser.json());
@@ -208,48 +222,60 @@ app.post('/setNewPassword', (req, res) => {
     res.status(401).json({ error: 'User not authenticated' });
   }
 });
+let name;
 app.post('/login', (req, res) => {
   const formData = req.body;
-  
+
   connection.query(
     'SELECT * FROM user WHERE username = ? AND password = ?',
     [formData.username, formData.password],
     (err, results) => {
       if (err) {
         console.error('Error checking login credentials:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
-      } else {
-        if (results.length > 0) {
-          const user = results[0];
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
 
-          // Check the user_type
-          if (user.user_type === 'admin') {
-            console.log('Admin logged in successfully');
-            res.json({ success: true, userType: 'admin' });
-          } else if (user.user_type === 'client') {
-            console.log('Client logged in successfully');
-            res.json({ success: true, userType: 'client' });
-          } else {
-            // Invalid user_type
-            console.log('Invalid user_type');
-            res.status(401).json({ error: 'Invalid user_type' });
-          }
+      if (results.length > 0) {
+        const user = results[0];
+        setUsername(formData.username);
 
+        // Check the user_type
+        if (user.user_type === 'admin') {
+          console.log('Admin logged in successfully:', getUsername());
+          return res.json({ success: true, userType: 'admin' });
+        } else if (user.user_type === 'client') {
+          console.log('Client logged in successfully:', getUsername());
+          return res.json({ success: true, userType: 'client' });
         } else {
-          // Login failed
-          console.log('Invalid username or password');
-          res.status(401).json({ error: 'Invalid username or password' });
+          // Invalid user_type
+          console.log('Invalid user_type');
+          return res.status(401).json({ error: 'Invalid user_type' });
         }
+      } else {
+        // Login failed
+        console.log('Invalid username or password');
+        return res.status(401).json({ error: 'Invalid username or password' });
       }
     }
   );
 });
 
 
+
 app.get('/loginConfirmation', (req, res) => {
   res.sendFile(__dirname + '/loginConfirmation.html');
 });
+io.on('connection', (socket) => {
+  console.log('User connected');
 
+  // You can handle chat connections here, passing necessary data
+  // For example, you might want to pass the user information from the session
+  const userId = req.session.userId; // Assuming you store user ID in the session
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
