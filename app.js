@@ -7,7 +7,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { setUsername, getUsername } = require('./userdata');
-
+const fs = require('fs');
 require('dotenv').config(); // Load environment variables
 const port = 3000;
 const app = express();
@@ -187,11 +187,18 @@ app.get('/setNewPassword', (req, res) => {
   res.sendFile(__dirname + '/setNewPassword.html');
 });
 app.get('/client', (req, res) => {
-  res.sendFile(__dirname + '/client/client.html');
+  const username = getUsername(); // Replace this with your actual logic to get the username
+  const adminHtml = fs.readFileSync(__dirname + '/client/client.html', 'utf8');
+  const updatedHtml = adminHtml.replace('<%= username %>', username);
+  res.send(updatedHtml);
 });
 app.get('/admin', (req, res) => {
-  res.sendFile(__dirname + '/admin/admin.html');
+  const username = getUsername(); // Replace this with your actual logic to get the username
+  const adminHtml = fs.readFileSync(__dirname + '/admin/admin.html', 'utf8');
+  const updatedHtml = adminHtml.replace('<%= username %>', username);
+  res.send(updatedHtml);
 });
+
 app.post('/setNewPassword', (req, res) => {
   const newPassword = req.body.newPassword;
 
@@ -238,6 +245,7 @@ app.post('/login', (req, res) => {
       if (results.length > 0) {
         const user = results[0];
         setUsername(formData.username);
+        name = formData.username;
 
         // Check the user_type
         if (user.user_type === 'admin') {
@@ -245,7 +253,7 @@ app.post('/login', (req, res) => {
           return res.json({ success: true, userType: 'admin' });
         } else if (user.user_type === 'client') {
           console.log('Client logged in successfully:', getUsername());
-          return res.json({ success: true, userType: 'client' });
+          return res.json({ success: true, userType: 'client', username: formData.username });
         } else {
           // Invalid user_type
           console.log('Invalid user_type');
@@ -259,6 +267,7 @@ app.post('/login', (req, res) => {
     }
   );
 });
+
 
 
 
