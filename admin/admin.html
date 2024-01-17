@@ -53,11 +53,11 @@
                 });
 
                 if (chatGptResponse.ok) {
-                    const chatGptData = await chatGptResponse.text();
-                    document.getElementById('chatgpt-response').textContent = `ChatGPT Response:\n${chatGptData}`;
-                } else {
-                    console.error('Failed to get ChatGPT response.');
-                }
+    const chatGptData = await chatGptResponse.text();
+    document.getElementById('chatgpt-response').innerHTML = `<pre>ChatGPT Response:\n${chatGptData}</pre>`;
+} else {
+    console.error('Failed to get ChatGPT response.');
+}
             } else {
                 console.error('Failed to parse PDF.');
             }

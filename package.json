@@ -18,6 +18,7 @@
     "express-session": "^1.17.3",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.6.5",
+    "nodemailer": "^6.9.8",
     "open": "^10.0.3",
     "pdf-parse": "^1.1.1",
     "socket.io": "^4.7.4",
