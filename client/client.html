@@ -3,19 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>ChatGPT Interface</title>
+  <title>Google Generative AI Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    #chat-container {
+      width: 800px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #message-list {
+      list-style-type: none;
+      padding: 10px;
+      margin: 0;
+      overflow-y: auto;
+      max-height: 300px;
+    }
+
+    .message-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .user-message,
+    .bot-message {
+      width: 80%; /* Adjust the width as needed */
+      align-self: flex-start;
+    }
+
+    .bot-message {
+      align-self: flex-end;
+    }
+
+    .user-label,
+    .bot-label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .timestamp {
+      color: #888;
+      align-self: flex-end;
+      margin-top: 4px;
+    }
+
+    #message-input {
+      width: 80%;
+      padding: 8px;
+      margin: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    #send-button {
+      width: 18%;
+      padding: 8px;
+      margin: 10px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-   <h1 id="welcome-message">Welcome, <span id="username"></span>!</h1>
   <div id="chat-container">
     <ul id="message-list"></ul>
-    <input type="text" id="message-input" placeholder="Type your question...">
-    <button id="send-button">Send</button>
+    <input type="text" id="message-input" placeholder="Enter your question...">
+    <button id="send-button" onclick="askQuestion()">Send</button>
   </div>
-  <script>const username = '<%= username %>'; // This syntax may vary depending on your server setup
-    document.getElementById('username').innerText = username;</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-  <script src="scripts.js"></script>
+
+  <script>
+    function getCurrentTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
+
+    async function askQuestion() {
+      const userInput = document.getElementById('message-input').value;
+
+      if (!userInput) return;
+
+      const messageList = document.getElementById('message-list');
+
+      // Display user message with timestamp and label
+      const userMessage = document.createElement('li');
+      userMessage.className = 'message-item user-message';
+      userMessage.innerHTML = `
+        <div class="user-label">You:</div>
+        <div>${userInput}</div>
+        <div class="timestamp">${getCurrentTime()}</div>
+      `;
+      messageList.appendChild(userMessage);
+
+      // Fetch response from server
+      const response = await fetch(`/ask?question=${encodeURIComponent(userInput)}`);
+      const responseData = await response.json();
+
+      // Display bot message with timestamp and label
+      const botMessage = document.createElement('li');
+      botMessage.className = 'message-item bot-message';
+      botMessage.innerHTML = `
+        <div class="bot-label">Bot:</div>
+        <div>${responseData.response}</div>
+        <div class="timestamp">${getCurrentTime()}</div>
+      `;
+      messageList.appendChild(botMessage);
+
+      // Display a gap
+      const messageGap = document.createElement('li');
+      messageGap.className = 'message-gap';
+      messageList.appendChild(messageGap);
+
+      // Clear user input
+      document.getElementById('message-input').value = '';
+
+      // Scroll to the bottom to show the latest messages
+      messageList.scrollTop = messageList.scrollHeight;
+    }
+  </script>
 </body>
 </html>

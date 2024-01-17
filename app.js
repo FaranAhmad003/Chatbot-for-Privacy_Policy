@@ -410,3 +410,26 @@ app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
 //==================================================
+
+
+//client response here for every question here
+app.get("/ask", async (req, res) => {
+  const question = req.query.question;
+
+  if (!question) {
+    res.status(400).json({ error: "Invalid question" });
+    return;
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(question);
+    const response = await result.response;
+    const text = response.text();
+
+    res.json({ response: text });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
