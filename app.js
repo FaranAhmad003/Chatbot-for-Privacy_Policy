@@ -13,6 +13,8 @@ const pdfParse = require("pdf-parse");
 const path = require("path");
 const nodemailer = require("nodemailer");
 
+
+
 require("dotenv").config(); // Load environment variables
 const port = 3000;
 const app = express();
@@ -246,7 +248,9 @@ app.post("/verifyOTP", (req, res) => {
 app.get("/setNewPassword", (req, res) => {
   res.sendFile(__dirname + "/setNewPassword.html");
 });
-app.get("/client", (req, res) => {
+app.get("/client",(req, res) => {
+  // verify the user is logged in, via cookie, username password
+}, (req, res) => {
   const username = getUsername(); // Replace this with your actual logic to get the username
   const adminHtml = fs.readFileSync(__dirname + "/client/client.html", "utf8");
   const updatedHtml = adminHtml.replace("<%= username %>", username);
@@ -361,6 +365,7 @@ app.post("/upload", upload.single("pdfFile"), (req, res) => {
 
         // Use the parsed text in the run function
         run(data.text);
+        sendQueryToAI(data.text)
       })
       .catch((error) => {
         console.error("Error parsing PDF:", error);
@@ -394,12 +399,11 @@ async function run(prompt) {
 app.get("/loginConfirmation", (req, res) => {
   res.sendFile(__dirname + "/loginConfirmation.html");
 });
+
+//socket here
 io.on("connection", (socket) => {
   console.log("User connected");
-
-  // You can handle chat connections here, passing necessary data
-  // For example, you might want to pass the user information from the session
-  const userId = req.session.userId; // Assuming you store user ID in the session
+  const userId = req.session.userId;
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
@@ -409,7 +413,8 @@ io.on("connection", (socket) => {
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
-//==================================================
+
+
 
 
 //client response here for every question here

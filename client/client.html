@@ -1,8 +1,10 @@
 <!DOCTYPE html>
+<script> const username = "<%= username %>";</script>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <title>Google Generative AI Chat</title>
   <style>
     body {
@@ -89,6 +91,9 @@
   </div>
 
   <script>
+    // Set up the Web Chat store to persist Conversation State in cookies.
+    
+   
     function getCurrentTime() {
       const now = new Date();
       const hours = now.getHours().toString().padStart(2, '0');
@@ -107,6 +112,7 @@
       const userMessage = document.createElement('li');
       userMessage.className = 'message-item user-message';
       userMessage.innerHTML = `
+      
         <div class="user-label">You:</div>
         <div>${userInput}</div>
         <div class="timestamp">${getCurrentTime()}</div>
@@ -119,7 +125,7 @@
 
       // Display bot message with timestamp and label
       const botMessage = document.createElement('li');
-      botMessage.className = 'message-item bot-message';
+      botMessage.className = 'message-item  bot-message';
       botMessage.innerHTML = `
         <div class="bot-label">Bot:</div>
         <div>${responseData.response}</div>

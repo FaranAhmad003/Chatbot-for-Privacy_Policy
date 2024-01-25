@@ -52,13 +52,16 @@
     }
   </style>
 </head>
-<body>
-  <form id="loginForm">
+<body style="background-color: antiquewhite; display: flex; flex-direction: column;">
+  <h1 style="margin-top: 12px;margin-bottom: 12px;">
+    Login
+  </h1>
+  <form id="loginForm" style="padding-top: 24px; padding-bottom: 24px;">
     <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
+    <input style="border-radius: 4px;" type="text" id="username" name="username" required>
 
     <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
+    <input style="border-radius: 4px;" type="password" id="password" name="password" required>
 
     <button type="button" onclick="submitForm()">Log In</button>
 
